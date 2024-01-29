@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://bxa3il3n3mmgh"]
+
+[ext_resource type="Texture2D" uid="uid://ckie8omhy4fh0" path="res://scenes/control_point/control_point_marker.png" id="1_cqwun"]
+
+[node name="ControlPoint" type="Marker2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("1_cqwun")
