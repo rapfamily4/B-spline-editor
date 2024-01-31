@@ -18,16 +18,8 @@ func _ready():
 		var new_y: float = randf_range(0, window_resolution.y * 0.3) + window_resolution.y * 0.35
 		add_control_point(Vector2(new_x, new_y))
 	
-	for i: int in range(STARTING_CONTROL_POINTS_COUNT + SPLINE_DEGREE):
-		if i in range(SPLINE_DEGREE):
-			knots.append(0)
-		elif i in range(STARTING_CONTROL_POINTS_COUNT, STARTING_CONTROL_POINTS_COUNT + SPLINE_DEGREE):
-			knots.append(1)
-		else:
-			knots.append(float(i - SPLINE_DEGREE + 1) / float(STARTING_CONTROL_POINTS_COUNT - SPLINE_DEGREE + 1))
-		print("Generated knot #" + str(i) + ":    " + str(knots[i]))
-	
-	update_curve()
+	generate_knots(true)
+	update_curve(1024)
 
 func _process(_delta):
 	pass
@@ -39,6 +31,20 @@ func add_control_point(point_position: Vector2 = Vector2.ZERO) -> void:
 
 func remove_control_point(point: Marker2D) -> void:
 	control_points_tree.remove_child(point)
+
+func generate_knots(clamped: bool = false) -> void:
+	for i: int in range(STARTING_CONTROL_POINTS_COUNT + SPLINE_DEGREE):
+		if clamped:
+			if i in range(SPLINE_DEGREE):
+				knots.append(0)
+			elif i in range(STARTING_CONTROL_POINTS_COUNT, STARTING_CONTROL_POINTS_COUNT + SPLINE_DEGREE):
+				knots.append(1)
+			else:
+				knots.append(float(i - SPLINE_DEGREE + 1) / float(STARTING_CONTROL_POINTS_COUNT - SPLINE_DEGREE + 1))
+		else:
+			knots.append(float(i) / float(STARTING_CONTROL_POINTS_COUNT + SPLINE_DEGREE - 1))
+		
+		print("Generated knot #" + str(i) + ":    " + str(knots[i]))
 
 func update_curve(resolution: int = 128) -> void:
 	for i: int in range(resolution + 1):
@@ -64,18 +70,10 @@ func _blend(control_point: int, degree: int, evaluation: float) -> float:
 	var result: float
 	if degree == 1:
 		result = 1 if (knots[control_point] <= evaluation) and (evaluation < knots[control_point + 1]) else 0
-		print("--- control_point: " + str(control_point) + ", degree: " + str(degree) + ", evaluation: " + str(evaluation) + " ---")
-		print("returned " + str(result))
 		return result
 	var aux0: float = _aux0(control_point, degree, evaluation)
 	var aux1: float = _aux1(control_point, degree, evaluation)
 	var blend0: float = _blend(control_point, degree - 1, evaluation)
 	var blend1: float = _blend(control_point + 1, degree - 1, evaluation)
 	result = aux0 * blend0 + aux1 * blend1
-	print("--- control_point: " + str(control_point) + ", degree: " + str(degree) + ", evaluation: " + str(evaluation) + " ---")
-	print("aux0: " + str(aux0))
-	print("aux1: " + str(aux1))
-	print("blend0: " + str(blend0))
-	print("blend1: " + str(blend1))
-	print("returned " + str(result))
 	return result
