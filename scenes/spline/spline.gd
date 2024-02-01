@@ -19,7 +19,7 @@ func _ready():
 		add_control_point(Vector2(new_x, new_y))
 	
 	generate_knots(true)
-	update_curve(1024)
+	update_curve()
 
 func _process(_delta):
 	pass
@@ -46,34 +46,25 @@ func generate_knots(clamped: bool = false) -> void:
 		
 		print("Generated knot #" + str(i) + ":    " + str(knots[i]))
 
-func update_curve(resolution: int = 128) -> void:
+func update_curve(resolution: int = 256) -> void:
 	for i: int in range(resolution + 1):
 		line_renderer.add_point(evaluate_curve(float(i) / float(resolution)))
 
 func evaluate_curve(evaluation_point: float) -> Vector2:
-	var spline_point: Vector2 = Vector2.ZERO
-	var blend_value: float
-	for i: int in range(STARTING_CONTROL_POINTS_COUNT):
-		blend_value = _blend(i, SPLINE_DEGREE, evaluation_point)
-		spline_point += blend_value * control_points_tree.get_child(i).position
-	return spline_point
+	for i: int in range(STARTING_CONTROL_POINTS_COUNT + SPLINE_DEGREE - 1):
+		if knots[i] <= evaluation_point and evaluation_point <= knots[i + 1]:
+			return de_boor_cox(i, SPLINE_DEGREE - 1, evaluation_point)
+	return Vector2.ZERO
 
-func _aux0(control_point: int, degree: int, evaluation: float) -> float:
-	var to_return: float = (evaluation - knots[control_point]) / (knots[control_point + degree - 1] - knots[control_point])
-	return to_return
+func aux(control_point: int, degree: int, evaluation_point: float) -> float:
+	return ((evaluation_point - knots[control_point])
+			/ (knots[control_point + SPLINE_DEGREE - degree] - knots[control_point]))
 
-func _aux1(control_point: int, degree: int, evaluation: float) -> float:
-	var to_return: float = (knots[control_point + degree] - evaluation) / (knots[control_point + degree] - knots[control_point + 1])
-	return to_return
-
-func _blend(control_point: int, degree: int, evaluation: float) -> float:
-	var result: float
-	if degree == 1:
-		result = 1 if (knots[control_point] <= evaluation) and (evaluation < knots[control_point + 1]) else 0
-		return result
-	var aux0: float = _aux0(control_point, degree, evaluation)
-	var aux1: float = _aux1(control_point, degree, evaluation)
-	var blend0: float = _blend(control_point, degree - 1, evaluation)
-	var blend1: float = _blend(control_point + 1, degree - 1, evaluation)
-	result = aux0 * blend0 + aux1 * blend1
-	return result
+func de_boor_cox(control_point: int, degree: int, evaluation_point: float) -> Vector2:
+	assert(knots[0] <= evaluation_point and evaluation_point <= knots[STARTING_CONTROL_POINTS_COUNT + SPLINE_DEGREE - 1])
+	if degree == 0:
+		return control_points_tree.get_child(control_point).position
+	var aux_val: float = aux(control_point, degree, evaluation_point)
+	var de_boor0 = de_boor_cox(control_point - 1, degree - 1, evaluation_point)
+	var de_boor1 = de_boor_cox(control_point, degree - 1, evaluation_point)
+	return (1 - aux_val) * de_boor0 + aux_val * de_boor1
