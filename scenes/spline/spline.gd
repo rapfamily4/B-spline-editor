@@ -1,13 +1,14 @@
 extends Node2D
 
-const SPLINE_DEGREE: int = 3 # k
-const CONTROL_POINTS_COUNT: int = 10 # n + 1
+const SPLINE_DEGREE: int = 2 # k
+const CONTROL_POINTS_COUNT: int = 10 # n
+# m = n + k = knots.size - 1
 
 @onready var line_renderer: Line2D = $LineRenderer
 @onready var control_points_tree: Node2D = $ControlPoints
 @onready var control_point_scene: PackedScene = preload("res://scenes/control_point/control_point.tscn")
 
-var knots: Array[float] # The knot vector is normalized in the interval [0, 1].
+var knots: Array[float] # It must be normalized in the interval [0, 1].
 
 
 func _ready():
@@ -29,47 +30,47 @@ func add_control_point(point_position: Vector2 = Vector2.ZERO) -> void:
 	new_point.position = point_position
 	control_points_tree.add_child(new_point)
 
-func remove_control_point(point: Marker2D) -> void:
-	control_points_tree.remove_child(point)
-
 func generate_knots(clamped: bool = false) -> void:
-	for i: int in range(CONTROL_POINTS_COUNT + SPLINE_DEGREE):
+	for i: int in range(CONTROL_POINTS_COUNT + SPLINE_DEGREE + 1):
 		if clamped:
-			if i in range(SPLINE_DEGREE):
+			if i in range(SPLINE_DEGREE + 1):
 				knots.append(0)
-			elif i in range(CONTROL_POINTS_COUNT, CONTROL_POINTS_COUNT + SPLINE_DEGREE):
+			elif i in range(CONTROL_POINTS_COUNT, CONTROL_POINTS_COUNT + SPLINE_DEGREE + 1):
 				knots.append(1)
 			else:
-				knots.append(float(i - SPLINE_DEGREE + 1) / float(CONTROL_POINTS_COUNT - SPLINE_DEGREE + 1))
+				knots.append(float(i - SPLINE_DEGREE) / float(CONTROL_POINTS_COUNT - SPLINE_DEGREE))
 		else:
-			knots.append(float(i) / float(CONTROL_POINTS_COUNT + SPLINE_DEGREE - 1))
+			knots.append(float(i) / float(CONTROL_POINTS_COUNT + SPLINE_DEGREE))
 		
 		print("Generated knot #" + str(i) + ":    " + str(knots[i]))
 
 func update_curve(resolution: int = 256) -> void:
 	for i: int in range(resolution + 1):
-		var evaluation_point: float = lerpf(knots[SPLINE_DEGREE - 1], knots[CONTROL_POINTS_COUNT],
+		# a <= t <= b, where knots[k] <= a and knots[n] >= b
+		var evaluation_point: float = lerpf(knots[SPLINE_DEGREE], knots[CONTROL_POINTS_COUNT],
 				float(i) / float(resolution))
 		line_renderer.add_point(evaluate_curve(evaluation_point))
 
 func evaluate_curve(evaluation_point: float) -> Vector2:
-	assert(knots[SPLINE_DEGREE - 1] <= evaluation_point and evaluation_point <= knots[CONTROL_POINTS_COUNT])
-	for i: int in range(SPLINE_DEGREE - 1, CONTROL_POINTS_COUNT + SPLINE_DEGREE - 1):
-		if knots[i] <= evaluation_point and evaluation_point <= knots[i + 1]:
-			return de_boor_cox(i, SPLINE_DEGREE - 1, evaluation_point)
+	assert(knots[SPLINE_DEGREE] <= evaluation_point and evaluation_point <= knots[CONTROL_POINTS_COUNT])
+	for j: int in range(SPLINE_DEGREE, CONTROL_POINTS_COUNT):
+		if knots[j] <= evaluation_point and evaluation_point < knots[j + 1]:
+			return de_boor_cox(j, SPLINE_DEGREE, evaluation_point)
 	return Vector2.ZERO
 
 func aux(control_point: int, degree: int, evaluation_point: float) -> float:
-	return ((evaluation_point - knots[control_point])
-			/ (knots[control_point + SPLINE_DEGREE - degree] - knots[control_point]))
+	if knots[control_point] < knots[control_point + degree]:
+		return ((evaluation_point - knots[control_point])
+			/ (knots[control_point + degree] - knots[control_point]))
+	return 0
 
 func de_boor_cox(control_point: int, degree: int, evaluation_point: float) -> Vector2:
 	assert(0 <= control_point and control_point < CONTROL_POINTS_COUNT)
-	assert(0 <= degree and degree <= SPLINE_DEGREE - 1)
-	assert(knots[0] <= evaluation_point and evaluation_point <= knots[CONTROL_POINTS_COUNT + SPLINE_DEGREE - 1])
+	assert(0 <= degree and degree <= SPLINE_DEGREE)
 	if degree == 0:
 		return control_points_tree.get_child(control_point).position
-	var aux_val: float = aux(control_point, degree, evaluation_point)
-	var de_boor0: Vector2 = de_boor_cox(control_point - 1, degree - 1, evaluation_point)
-	var de_boor1: Vector2 = de_boor_cox(control_point, degree - 1, evaluation_point)
-	return (1 - aux_val) * de_boor0 + aux_val * de_boor1
+	var r: int = degree - 1
+	var aux_val: float = aux(control_point, degree - r, evaluation_point)
+	var de_boor0: Vector2 = de_boor_cox(control_point, r, evaluation_point)
+	var de_boor1: Vector2 = de_boor_cox(control_point - 1, r, evaluation_point)
+	return aux_val * de_boor0 + (1 - aux_val) * de_boor1
