@@ -6,5 +6,6 @@
 script = ExtResource("1_fyr6t")
 
 [node name="LineRenderer" type="Line2D" parent="."]
+width = 5.0
 
 [node name="ControlPoints" type="Node2D" parent="."]

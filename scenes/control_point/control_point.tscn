@@ -1,11 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://bxa3il3n3mmgh"]
+[gd_scene load_steps=4 format=3 uid="uid://bxa3il3n3mmgh"]
 
 [ext_resource type="Texture2D" uid="uid://ckie8omhy4fh0" path="res://scenes/control_point/control_point_marker.png" id="1_cqwun"]
+[ext_resource type="Script" path="res://scenes/control_point/draggable.gd" id="1_lninv"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4mv5g"]
 radius = 13.0
 
 [node name="ControlPoint" type="Marker2D"]
+script = ExtResource("1_lninv")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(0.2, 0.2)
@@ -15,3 +17,5 @@ texture = ExtResource("1_cqwun")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("CircleShape2D_4mv5g")
+
+[connection signal="input_event" from="Area2D" to="." method="_input_event"]

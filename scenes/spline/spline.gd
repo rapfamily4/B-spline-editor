@@ -8,6 +8,10 @@ const CONTROL_POINTS_COUNT: int = 10 # n
 @onready var control_points_tree: Node2D = $ControlPoints
 @onready var control_point_scene: PackedScene = preload("res://scenes/control_point/control_point.tscn")
 
+var spline_resolution: int = 256:
+	set(value):
+		spline_resolution = value
+		update_curve(value)
 var knots: Array[float] # It must be normalized in the interval [0, 1].
 var evaluation_min: float = -INF # a
 var evaluation_max: float = INF # b
@@ -22,7 +26,7 @@ func _ready():
 		add_control_point(Vector2(new_x, new_y))
 	
 	generate_knots(true, false)
-	update_curve()
+	update_curve(spline_resolution)
 
 func _process(_delta):
 	pass
@@ -30,6 +34,7 @@ func _process(_delta):
 func add_control_point(point_position: Vector2 = Vector2.ZERO) -> void:
 	var new_point: Marker2D = control_point_scene.instantiate()
 	new_point.position = point_position
+	new_point.control_point_moved.connect(update_curve, spline_resolution)
 	control_points_tree.add_child(new_point)
 
 func generate_knots(clamped: bool = false, averaged_internal_knots: bool = false) -> void:
@@ -56,6 +61,7 @@ func generate_knots(clamped: bool = false, averaged_internal_knots: bool = false
 	print("Set evaluation range:\t[" + str(evaluation_min) + ", " + str(evaluation_max) + "]")
 
 func update_curve(resolution: int = 256) -> void:
+	line_renderer.clear_points()
 	for i: int in range(resolution):
 		var evaluation_point: float = lerpf(evaluation_min, evaluation_max, float(i) / float(resolution - 1))
 		line_renderer.add_point(evaluate_curve(evaluation_point))
