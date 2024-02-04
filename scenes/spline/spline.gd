@@ -71,7 +71,7 @@ func evaluate_curve(evaluation_point: float) -> Vector2:
 	for j: int in range(SPLINE_DEGREE, CONTROL_POINTS_COUNT):
 		if knots[j] <= evaluation_point and evaluation_point < knots[j + 1]:
 			return de_boor_cox(j, SPLINE_DEGREE, evaluation_point)
-	return Vector2.ZERO
+	return control_points_tree.get_child(CONTROL_POINTS_COUNT - 1).position
 
 func aux(control_point: int, degree: int, evaluation_point: float) -> float:
 	if knots[control_point] < knots[control_point + degree]:
