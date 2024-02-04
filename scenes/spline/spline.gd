@@ -56,8 +56,8 @@ func generate_knots(clamped: bool = false, averaged_internal_knots: bool = false
 	print("Set evaluation range:\t[" + str(evaluation_min) + ", " + str(evaluation_max) + "]")
 
 func update_curve(resolution: int = 256) -> void:
-	for i: int in range(resolution + 1):
-		var evaluation_point: float = lerpf(evaluation_min, evaluation_max, float(i) / float(resolution))
+	for i: int in range(resolution):
+		var evaluation_point: float = lerpf(evaluation_min, evaluation_max, float(i) / float(resolution - 1))
 		line_renderer.add_point(evaluate_curve(evaluation_point))
 
 func evaluate_curve(evaluation_point: float) -> Vector2:
