@@ -1,6 +1,16 @@
 extends Node2D
+class_name Spline
 
-const SPLINE_DEGREE: int = 2 # k
+signal evaluation_min_changed(value: float)
+signal evaluation_max_changed(value: float)
+signal knot_vector_changed(knots: Array[float])
+
+enum KnotsGenerationMode {
+	Unclamped,
+	Clamped,
+	ClampedAveraged,
+}
+
 const CONTROL_POINTS_COUNT: int = 10 # n
 # m = n + k = knots.size - 1
 
@@ -8,11 +18,10 @@ const CONTROL_POINTS_COUNT: int = 10 # n
 @onready var control_points_tree: Node2D = $ControlPoints
 @onready var control_point_scene: PackedScene = preload("res://scenes/control_point/control_point.tscn")
 
-var spline_resolution: int = 256:
-	set(value):
-		spline_resolution = value
-		update_curve(value)
+var spline_degree: int = 2 # k
+var spline_resolution: int = 128
 var knots: Array[float] # It must be normalized in the interval [0, 1].
+var knots_generation_mode: KnotsGenerationMode = KnotsGenerationMode.ClampedAveraged
 var evaluation_min: float = -INF # a
 var evaluation_max: float = INF # b
 
@@ -20,12 +29,12 @@ var evaluation_max: float = INF # b
 func _ready():
 	var window_resolution: Vector2 = get_window().size
 	for i: int in range(CONTROL_POINTS_COUNT):
-		var new_x: float = lerpf(-window_resolution.x * 0.4, window_resolution.x * 0.4, float(i) / float(CONTROL_POINTS_COUNT - 1))
-		var new_y: float = randf_range(-window_resolution.y * 0.2, window_resolution.y * 0.2)
+		var new_x: float = lerpf(-window_resolution.x * 0.3, window_resolution.x * 0.3, float(i) / float(CONTROL_POINTS_COUNT - 1))
+		var new_y: float = randf_range(-window_resolution.y * 0.125, window_resolution.y * 0.125)
 		add_control_point(Vector2(new_x, new_y))
 	
-	generate_knots(true, true)
-	update_curve(spline_resolution)
+	generate_knots()
+	update_curve()
 
 func _process(_delta):
 	pass
@@ -36,49 +45,54 @@ func add_control_point(point_position: Vector2 = Vector2.ZERO) -> void:
 	new_point.control_point_moved.connect(update_curve, spline_resolution)
 	control_points_tree.add_child(new_point)
 
-func generate_knots(clamped: bool = false, averaged_internal_knots: bool = false) -> void:
-	for i: int in range(CONTROL_POINTS_COUNT + SPLINE_DEGREE + 1):
-		if clamped:
-			if i in range(SPLINE_DEGREE + 1):
+func generate_knots() -> void:
+	knots.clear()
+	for i: int in range(CONTROL_POINTS_COUNT + spline_degree + 1):
+		if knots_generation_mode != KnotsGenerationMode.Unclamped:
+			if i in range(spline_degree + 1):
 				knots.append(0)
-			elif i in range(CONTROL_POINTS_COUNT, CONTROL_POINTS_COUNT + SPLINE_DEGREE + 1):
+			elif i in range(CONTROL_POINTS_COUNT, CONTROL_POINTS_COUNT + spline_degree + 1):
 				knots.append(1)
-			elif averaged_internal_knots:
+			elif knots_generation_mode == KnotsGenerationMode.ClampedAveraged:
 				# De Boor's parameter averaging; parameters are generated on the fly.
 				var sum: float = 0
-				for j: int in range(i - SPLINE_DEGREE, i):
+				for j: int in range(i - spline_degree, i):
 					sum += float(j) / float(CONTROL_POINTS_COUNT - 1)
-				knots.append(sum / float(SPLINE_DEGREE))
+				knots.append(sum / float(spline_degree))
 			else:
-				knots.append(float(i - SPLINE_DEGREE) / float(CONTROL_POINTS_COUNT - SPLINE_DEGREE))
+				knots.append(float(i - spline_degree) / float(CONTROL_POINTS_COUNT - spline_degree))
 		else:
-			knots.append(float(i) / float(CONTROL_POINTS_COUNT + SPLINE_DEGREE))
+			knots.append(float(i) / float(CONTROL_POINTS_COUNT + spline_degree))
 		print("Generated knot #" + str(i) + ":\t\t" + str(knots[i]))
 	
-	evaluation_min = knots[SPLINE_DEGREE]
-	evaluation_max = knots[CONTROL_POINTS_COUNT]
+	if evaluation_min < knots[spline_degree]:
+		evaluation_min = knots[spline_degree]
+		evaluation_min_changed.emit(evaluation_min)
+	if evaluation_max > knots[CONTROL_POINTS_COUNT]:
+		evaluation_max = knots[CONTROL_POINTS_COUNT]
+		evaluation_max_changed.emit(evaluation_max)
 	print("Set evaluation range:\t[" + str(evaluation_min) + ", " + str(evaluation_max) + "]")
 
-func update_curve(resolution: int = 256) -> void:
+func update_curve() -> void:
 	line_renderer.clear_points()
-	for i: int in range(resolution):
-		var evaluation_point: float = lerpf(evaluation_min, evaluation_max, float(i) / float(resolution - 1))
+	for i: int in range(spline_resolution):
+		var evaluation_point: float = lerpf(evaluation_min, evaluation_max, float(i) / float(spline_resolution - 1))
 		line_renderer.add_point(evaluate_curve(evaluation_point))
 
 func evaluate_curve(evaluation_point: float) -> Vector2:
 	assert(evaluation_min <= evaluation_point and evaluation_point <= evaluation_max)
-	for j: int in range(SPLINE_DEGREE, CONTROL_POINTS_COUNT):
+	for j: int in range(spline_degree, CONTROL_POINTS_COUNT):
 		if knots[j] <= evaluation_point and evaluation_point < knots[j + 1]:
-			return de_boor_cox(j, SPLINE_DEGREE, evaluation_point)
+			return de_boor_cox(j, spline_degree, evaluation_point)
 	return control_points_tree.get_child(CONTROL_POINTS_COUNT - 1).position
 
 func aux(control_point: int, degree: int, evaluation_point: float) -> float:
 	return ((evaluation_point - knots[control_point])
-			/ (knots[control_point + SPLINE_DEGREE + 1 - degree] - knots[control_point]))
+			/ (knots[control_point + spline_degree + 1 - degree] - knots[control_point]))
 
 func de_boor_cox(control_point: int, degree: int, evaluation_point: float) -> Vector2:
 	assert(0 <= control_point and control_point < CONTROL_POINTS_COUNT)
-	assert(0 <= degree and degree <= SPLINE_DEGREE)
+	assert(0 <= degree and degree <= spline_degree)
 	if degree == 0:
 		return control_points_tree.get_child(control_point).position
 	var aux_val: float = aux(control_point, degree, evaluation_point)

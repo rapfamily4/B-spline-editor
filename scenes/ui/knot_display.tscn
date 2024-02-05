@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://bsk4guawix38j"]
+
+[ext_resource type="PackedScene" uid="uid://bcmfe1ygw6dxc" path="res://scenes/ui/number_display.tscn" id="1_0tjbt"]
+[ext_resource type="Script" path="res://scenes/ui/knot_display.gd" id="1_kyyrb"]
+
+[node name="KnotDisplay" instance=ExtResource("1_0tjbt")]
+script = ExtResource("1_kyyrb")
+
+[node name="Label" parent="." index="0"]
+custom_minimum_size = Vector2(32, 20)
+
+[node name="SpinBox" parent="." index="1"]
+custom_minimum_size = Vector2(128, 20)
