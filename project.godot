@@ -11,7 +11,9 @@ config_version=5
 [application]
 
 config/name="Generalized Spline Editor"
-run/main_scene="res://scenes/workbench/workbench.tscn"
+config/description="Simple demo in which you can edit a grade two B-spline evaluated with the De Boor - Cox algorithm."
+config/version="1.0"
+run/main_scene="res://scenes/editor.tscn"
 config/features=PackedStringArray("4.2", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -19,7 +21,6 @@ config/icon="res://icon.svg"
 
 window/size/viewport_width=1024
 window/size/viewport_height=720
-window/size/resizable=false
 
 [dotnet]
 

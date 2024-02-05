@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://c54q2t3y8qrgv"]
+
+[ext_resource type="PackedScene" uid="uid://c88kfao0yffie" path="res://scenes/workbench/workbench.tscn" id="1_0hxwl"]
+[ext_resource type="Script" path="res://scenes/draggable.gd" id="2_ahe6d"]
+
+[node name="Editor" type="Node2D"]
+
+[node name="Workbench" parent="." instance=ExtResource("1_0hxwl")]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("2_ahe6d")
+button_to_press = 2
+mouse_must_be_over = false
+invert_mouse_delta = true

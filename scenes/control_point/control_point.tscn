@@ -1,13 +1,13 @@
 [gd_scene load_steps=4 format=3 uid="uid://bxa3il3n3mmgh"]
 
 [ext_resource type="Texture2D" uid="uid://ckie8omhy4fh0" path="res://scenes/control_point/control_point_marker.png" id="1_cqwun"]
-[ext_resource type="Script" path="res://scenes/control_point/draggable.gd" id="1_lninv"]
+[ext_resource type="Script" path="res://scenes/draggable.gd" id="1_y8kwf"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4mv5g"]
 radius = 13.0
 
 [node name="ControlPoint" type="Marker2D"]
-script = ExtResource("1_lninv")
+script = ExtResource("1_y8kwf")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(0.2, 0.2)

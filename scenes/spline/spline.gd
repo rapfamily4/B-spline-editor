@@ -18,11 +18,10 @@ var evaluation_max: float = INF # b
 
 
 func _ready():
-	# Palcement is not parametrized: it needs refactoring.
 	var window_resolution: Vector2 = get_window().size
 	for i: int in range(CONTROL_POINTS_COUNT):
-		var new_x: float = i * window_resolution.x * 0.1 + window_resolution.x * 0.05
-		var new_y: float = randf_range(0, window_resolution.y * 0.3) + window_resolution.y * 0.35
+		var new_x: float = lerpf(-window_resolution.x * 0.4, window_resolution.x * 0.4, float(i) / float(CONTROL_POINTS_COUNT - 1))
+		var new_y: float = randf_range(-window_resolution.y * 0.2, window_resolution.y * 0.2)
 		add_control_point(Vector2(new_x, new_y))
 	
 	generate_knots(true, true)
