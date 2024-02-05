@@ -25,7 +25,7 @@ func _ready():
 		var new_y: float = randf_range(0, window_resolution.y * 0.3) + window_resolution.y * 0.35
 		add_control_point(Vector2(new_x, new_y))
 	
-	generate_knots(true, false)
+	generate_knots(true, true)
 	update_curve(spline_resolution)
 
 func _process(_delta):
@@ -74,18 +74,15 @@ func evaluate_curve(evaluation_point: float) -> Vector2:
 	return control_points_tree.get_child(CONTROL_POINTS_COUNT - 1).position
 
 func aux(control_point: int, degree: int, evaluation_point: float) -> float:
-	if knots[control_point] < knots[control_point + degree]:
-		return ((evaluation_point - knots[control_point])
-			/ (knots[control_point + degree] - knots[control_point]))
-	return 0
+	return ((evaluation_point - knots[control_point])
+			/ (knots[control_point + SPLINE_DEGREE + 1 - degree] - knots[control_point]))
 
 func de_boor_cox(control_point: int, degree: int, evaluation_point: float) -> Vector2:
 	assert(0 <= control_point and control_point < CONTROL_POINTS_COUNT)
 	assert(0 <= degree and degree <= SPLINE_DEGREE)
 	if degree == 0:
 		return control_points_tree.get_child(control_point).position
-	var r: int = degree - 1
-	var aux_val: float = aux(control_point, degree - r, evaluation_point)
-	var de_boor0: Vector2 = de_boor_cox(control_point, r, evaluation_point)
-	var de_boor1: Vector2 = de_boor_cox(control_point - 1, r, evaluation_point)
+	var aux_val: float = aux(control_point, degree, evaluation_point)
+	var de_boor0: Vector2 = de_boor_cox(control_point, degree - 1, evaluation_point)
+	var de_boor1: Vector2 = de_boor_cox(control_point - 1, degree - 1, evaluation_point)
 	return aux_val * de_boor0 + (1 - aux_val) * de_boor1
