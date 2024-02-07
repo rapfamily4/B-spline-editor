@@ -2,6 +2,7 @@ extends Node2D
 class_name Spline
 
 signal knot_generation_finished(knots: Array[float], eval_min: float, eval_max: float)
+signal knot_vector_sorted(knots: Array[float])
 
 enum KnotsGenerationMode {
 	Unclamped,
@@ -20,7 +21,7 @@ var spline_degree: int = 2: # k
 	set(value):
 		assert(value >= 0)
 		spline_degree = value
-var spline_resolution: int = 128:
+var spline_resolution: int = 96:
 	set(value):
 		assert(value >= 0)
 		spline_resolution = value
@@ -82,6 +83,23 @@ func generate_knots() -> void:
 	print("Set evaluation range:\t[" + str(evaluation_min) + ", " + str(evaluation_max) + "]")
 	
 	knot_generation_finished.emit(knots, evaluation_min, evaluation_max)
+
+func set_knot(index: int, value: float) -> void:
+	knots[index] = value
+	knots.sort()
+	
+	var eval_range_changed: bool = false
+	if evaluation_min < knots[spline_degree]:
+		evaluation_min = knots[spline_degree]
+		eval_range_changed = true
+	if evaluation_max > knots[CONTROL_POINTS_COUNT]:
+		evaluation_max = knots[CONTROL_POINTS_COUNT]
+		eval_range_changed = true
+	
+	if eval_range_changed:
+		knot_generation_finished.emit(knots, evaluation_min, evaluation_max)
+	else:
+		knot_vector_sorted.emit(knots)
 
 func update_curve() -> void:
 	line_renderer.clear_points()

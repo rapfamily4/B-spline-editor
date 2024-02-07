@@ -1,7 +1,6 @@
-[gd_scene load_steps=9 format=3 uid="uid://b76gwna6pijs8"]
+[gd_scene load_steps=8 format=3 uid="uid://b76gwna6pijs8"]
 
 [ext_resource type="PackedScene" uid="uid://bcmfe1ygw6dxc" path="res://scenes/ui/number_display.tscn" id="1_3pqlj"]
-[ext_resource type="PackedScene" uid="uid://bsk4guawix38j" path="res://scenes/ui/knot_display.tscn" id="1_r1o5p"]
 [ext_resource type="Script" path="res://scenes/ui/ui.gd" id="1_uhfw4"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_ftg48"]
@@ -20,56 +19,67 @@ Button/font_sizes/font_size = 12
 [node name="UI" type="CanvasLayer"]
 script = ExtResource("1_uhfw4")
 
-[node name="SideOptions" type="VBoxContainer" parent="."]
-anchors_preset = -1
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+custom_minimum_size = Vector2(196, 0)
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 16.0
 offset_top = 16.0
-offset_right = 164.0
+offset_right = -16.0
 offset_bottom = -16.0
+grow_horizontal = 0
 grow_vertical = 2
-size_flags_horizontal = 0
+size_flags_vertical = 3
 
-[node name="EvaluationLabel" type="Label" parent="SideOptions"]
+[node name="SideBar" type="VBoxContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+
+[node name="EvaluationLabel" type="Label" parent="ScrollContainer/SideBar"]
 layout_mode = 2
 text = "Evaluation"
 label_settings = SubResource("LabelSettings_ftg48")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Separator0" type="HSeparator" parent="SideOptions"]
+[node name="Separator0" type="HSeparator" parent="ScrollContainer/SideBar"]
 modulate = Color(1, 1, 1, 0)
 custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
 
-[node name="DegreeDisplay" parent="SideOptions" instance=ExtResource("1_3pqlj")]
+[node name="DegreeDisplay" parent="ScrollContainer/SideBar" instance=ExtResource("1_3pqlj")]
+unique_name_in_owner = true
 layout_mode = 2
 startup_label_text = "Degree"
 round_to_integers = true
 startup_min = 1.0
 startup_max = 9.0
 
-[node name="ResolutionDisplay" parent="SideOptions" instance=ExtResource("1_3pqlj")]
+[node name="ResolutionDisplay" parent="ScrollContainer/SideBar" instance=ExtResource("1_3pqlj")]
+unique_name_in_owner = true
 layout_mode = 2
 startup_label_text = "Resolution"
 round_to_integers = true
 startup_min = 2.0
 startup_max = 1024.0
 
-[node name="EvalMinDisplay" parent="SideOptions" instance=ExtResource("1_3pqlj")]
+[node name="EvalMinDisplay" parent="ScrollContainer/SideBar" instance=ExtResource("1_3pqlj")]
+unique_name_in_owner = true
 layout_mode = 2
 startup_label_text = "Eval Min"
 
-[node name="EvalMaxDisplay" parent="SideOptions" instance=ExtResource("1_3pqlj")]
+[node name="EvalMaxDisplay" parent="ScrollContainer/SideBar" instance=ExtResource("1_3pqlj")]
+unique_name_in_owner = true
 layout_mode = 2
 startup_label_text = "Eval Max"
 
-[node name="Separator2" type="HSeparator" parent="SideOptions"]
+[node name="Separator1" type="HSeparator" parent="ScrollContainer/SideBar"]
 modulate = Color(1, 1, 1, 0)
-custom_minimum_size = Vector2(0, 16)
+custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 
-[node name="KnotsLabel" type="Label" parent="SideOptions"]
+[node name="KnotsLabel" type="Label" parent="ScrollContainer/SideBar"]
 layout_mode = 2
 text = "Knots
 "
@@ -77,19 +87,20 @@ label_settings = SubResource("LabelSettings_rj8bn")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Separator3" type="HSeparator" parent="SideOptions"]
+[node name="Separator2" type="HSeparator" parent="ScrollContainer/SideBar"]
 modulate = Color(1, 1, 1, 0)
 custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
 
-[node name="KnotGenLabel" type="Label" parent="SideOptions"]
+[node name="KnotGenLabel" type="Label" parent="ScrollContainer/SideBar"]
 layout_mode = 2
-text = "Generate Knots"
+text = "Generation Mode"
 label_settings = SubResource("LabelSettings_2aiiu")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="KnotGenDropdown" type="OptionButton" parent="SideOptions"]
+[node name="KnotGenDropdown" type="OptionButton" parent="ScrollContainer/SideBar"]
+unique_name_in_owner = true
 layout_mode = 2
 theme = SubResource("Theme_vbm80")
 item_count = 3
@@ -101,17 +112,18 @@ popup/item_1/id = 1
 popup/item_2/text = "Clamped (averaged)"
 popup/item_2/id = 2
 
-[node name="KnotGenButton" type="Button" parent="SideOptions"]
+[node name="KnotGenButton" type="Button" parent="ScrollContainer/SideBar"]
+unique_name_in_owner = true
 layout_mode = 2
 theme = SubResource("Theme_5kwc2")
 text = "Reset Knots"
 
-[node name="Separator4" type="HSeparator" parent="SideOptions"]
+[node name="Separator3" type="HSeparator" parent="ScrollContainer/SideBar"]
 modulate = Color(1, 1, 1, 0)
 custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
 
-[node name="KnotVectorLabel" type="Label" parent="SideOptions"]
+[node name="KnotVectorLabel" type="Label" parent="ScrollContainer/SideBar"]
 layout_mode = 2
 text = "Knot Vector
 "
@@ -119,23 +131,7 @@ label_settings = SubResource("LabelSettings_2aiiu")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="KnotVectorScroll" type="ScrollContainer" parent="SideOptions"]
-custom_minimum_size = Vector2(0, 128)
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="KnotVector" type="VBoxContainer" parent="SideOptions/KnotVectorScroll"]
+[node name="KnotVector" type="VBoxContainer" parent="ScrollContainer/SideBar"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
-
-[node name="KnotDisplay" parent="SideOptions/KnotVectorScroll/KnotVector" instance=ExtResource("1_r1o5p")]
-layout_mode = 2
-startup_label_text = "0"
-
-[node name="KnotDisplay2" parent="SideOptions/KnotVectorScroll/KnotVector" instance=ExtResource("1_r1o5p")]
-layout_mode = 2
-startup_label_text = "1"
-
-[node name="KnotDisplay3" parent="SideOptions/KnotVectorScroll/KnotVector" instance=ExtResource("1_r1o5p")]
-layout_mode = 2
-startup_label_text = "2"
