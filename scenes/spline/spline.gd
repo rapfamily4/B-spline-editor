@@ -15,7 +15,9 @@ const CONTROL_POINTS_COUNT: int = 10 # n
 
 @onready var line_renderer: Line2D = $LineRenderer
 @onready var control_points_tree: Node2D = $ControlPoints
+@onready var knot_markers_tree: Node2D = $KnotMarkers
 @onready var control_point_scene: PackedScene = preload("res://scenes/control_point/control_point.tscn")
+@onready var knot_marker_scene: PackedScene = preload("res://scenes/knot_marker/knot_marker.tscn")
 
 var spline_degree: int = 2: # k
 	set(value):
@@ -27,6 +29,10 @@ var spline_resolution: int = 96:
 		spline_resolution = value
 var knots: Array[float] # It must be normalized in the interval [0, 1].
 var knots_generation_mode: KnotsGenerationMode = KnotsGenerationMode.Unclamped
+var show_curve_connection_markers: bool = false:
+	set(value):
+		knot_markers_tree.visible = value
+		show_curve_connection_markers = value
 var evaluation_min: float = -INF: # a
 	set(value):
 		assert(value >= knots[spline_degree])
@@ -38,14 +44,13 @@ var evaluation_max: float = INF: # b
 
 
 func _ready():
+	show_curve_connection_markers = show_curve_connection_markers
 	var window_resolution: Vector2 = get_window().size
 	for i: int in range(CONTROL_POINTS_COUNT):
 		var new_x: float = lerpf(-window_resolution.x * 0.2, window_resolution.x * 0.2, float(i) / float(CONTROL_POINTS_COUNT - 1))
 		var new_y: float = randf_range(-window_resolution.y * 0.075, window_resolution.y * 0.075)
 		add_control_point(Vector2(new_x, new_y))
-	
 	generate_knots()
-	update_curve()
 
 func _process(_delta):
 	pass
@@ -80,8 +85,13 @@ func generate_knots() -> void:
 	evaluation_max = knots[CONTROL_POINTS_COUNT]
 	print("Set evaluation range:\t[" + str(evaluation_min) + ", " + str(evaluation_max) + "]")
 	
-	knot_generation_finished.emit(knots)
+	for marker: Marker2D in knot_markers_tree.get_children():
+		marker.free()
+	for i: int in range(knots.size() - 2 * spline_degree - 2):
+		knot_markers_tree.add_child(knot_marker_scene.instantiate())
+	
 	update_curve()
+	knot_generation_finished.emit(knots)
 
 func set_knot(index: int, value: float) -> void:
 	knots[index] = value
@@ -96,6 +106,10 @@ func update_curve() -> void:
 	for i: int in range(spline_resolution):
 		var evaluation_point: float = lerpf(evaluation_min, evaluation_max, float(i) / float(spline_resolution - 1))
 		line_renderer.add_point(evaluate_curve(evaluation_point))
+	
+	for i: int in range(spline_degree + 1, knots.size() - spline_degree - 1):
+		var marker: Marker2D = knot_markers_tree.get_child(i - spline_degree - 1)
+		marker.position = evaluate_curve(knots[i])
 
 func evaluate_curve(evaluation_point: float) -> Vector2:
 	assert(evaluation_min < evaluation_point or is_equal_approx(evaluation_min, evaluation_point))

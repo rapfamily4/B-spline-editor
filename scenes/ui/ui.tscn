@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://b76gwna6pijs8"]
+[gd_scene load_steps=9 format=3 uid="uid://b76gwna6pijs8"]
 
 [ext_resource type="PackedScene" uid="uid://bcmfe1ygw6dxc" path="res://scenes/ui/number_display.tscn" id="1_3pqlj"]
 [ext_resource type="Script" path="res://scenes/ui/ui.gd" id="1_uhfw4"]
@@ -6,6 +6,9 @@
 [sub_resource type="LabelSettings" id="LabelSettings_ftg48"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_rj8bn"]
+
+[sub_resource type="Theme" id="Theme_2ho17"]
+CheckButton/font_sizes/font_size = 10
 
 [sub_resource type="LabelSettings" id="LabelSettings_2aiiu"]
 font_size = 12
@@ -82,6 +85,17 @@ modulate = Color(1, 1, 1, 0)
 custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
 
+[node name="CurveConnectionsButton" type="CheckButton" parent="ScrollContainer/SideBar"]
+unique_name_in_owner = true
+layout_mode = 2
+theme = SubResource("Theme_2ho17")
+text = "Show Curve Connections"
+
+[node name="Separator3" type="HSeparator" parent="ScrollContainer/SideBar"]
+modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+
 [node name="KnotGenLabel" type="Label" parent="ScrollContainer/SideBar"]
 layout_mode = 2
 text = "Generation Mode"
@@ -107,7 +121,7 @@ layout_mode = 2
 theme = SubResource("Theme_5kwc2")
 text = "Reset Knots"
 
-[node name="Separator3" type="HSeparator" parent="ScrollContainer/SideBar"]
+[node name="Separator4" type="HSeparator" parent="ScrollContainer/SideBar"]
 modulate = Color(1, 1, 1, 0)
 custom_minimum_size = Vector2(0, 4)
 layout_mode = 2

@@ -9,3 +9,5 @@ script = ExtResource("1_fyr6t")
 width = 5.0
 
 [node name="ControlPoints" type="Node2D" parent="."]
+
+[node name="KnotMarkers" type="Node2D" parent="."]
