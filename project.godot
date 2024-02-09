@@ -11,11 +11,10 @@ config_version=5
 [application]
 
 config/name="Generalized Spline Editor"
-config/description="Simple demo in which you can edit a grade two B-spline evaluated with the De Boor - Cox algorithm."
+config/description="Simple demo in which you can edit a B-spline evaluated with the De Boor - Cox algorithm."
 config/version="1.0"
 run/main_scene="res://scenes/editor.tscn"
 config/features=PackedStringArray("4.2", "GL Compatibility")
-config/icon="res://icon.svg"
 
 [display]
 
