@@ -70,6 +70,7 @@ func _on_knot_gen_dropdown_selected(value: int) -> void:
 
 func _on_knot_gen_button_pressed() -> void:
 	spline.generate_knots()
+	spline.update_curve()
 
 # Support functions.
 func _update_eval_range() -> void:
