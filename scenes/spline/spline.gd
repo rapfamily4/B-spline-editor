@@ -1,7 +1,7 @@
 extends Node2D
 class_name Spline
 
-signal knot_generation_finished(knots: Array[float], eval_min: float, eval_max: float)
+signal knot_generation_finished(knots: Array[float])
 signal knot_vector_sorted(knots: Array[float])
 
 enum KnotsGenerationMode {
@@ -76,30 +76,20 @@ func generate_knots() -> void:
 			knots.append(float(i) / float(CONTROL_POINTS_COUNT + spline_degree))
 		print("Generated knot #" + str(i) + ":\t\t" + str(knots[i]))
 		
-	if evaluation_min < knots[spline_degree]:
-		evaluation_min = knots[spline_degree]
-	if evaluation_max > knots[CONTROL_POINTS_COUNT]:
-		evaluation_max = knots[CONTROL_POINTS_COUNT]
+	evaluation_min = knots[spline_degree]
+	evaluation_max = knots[CONTROL_POINTS_COUNT]
 	print("Set evaluation range:\t[" + str(evaluation_min) + ", " + str(evaluation_max) + "]")
 	
-	knot_generation_finished.emit(knots, evaluation_min, evaluation_max)
+	knot_generation_finished.emit(knots)
+	update_curve()
 
 func set_knot(index: int, value: float) -> void:
 	knots[index] = value
 	knots.sort()
-	
-	var eval_range_changed: bool = false
-	if evaluation_min < knots[spline_degree]:
-		evaluation_min = knots[spline_degree]
-		eval_range_changed = true
-	if evaluation_max > knots[CONTROL_POINTS_COUNT]:
-		evaluation_max = knots[CONTROL_POINTS_COUNT]
-		eval_range_changed = true
-	
-	if eval_range_changed:
-		knot_generation_finished.emit(knots, evaluation_min, evaluation_max)
-	else:
-		knot_vector_sorted.emit(knots)
+	evaluation_min = knots[spline_degree]
+	evaluation_max = knots[CONTROL_POINTS_COUNT]
+	knot_vector_sorted.emit(knots)
+	update_curve()
 
 func update_curve() -> void:
 	line_renderer.clear_points()

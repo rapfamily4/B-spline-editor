@@ -64,16 +64,6 @@ round_to_integers = true
 startup_min = 2.0
 startup_max = 1024.0
 
-[node name="EvalMinDisplay" parent="ScrollContainer/SideBar" instance=ExtResource("1_3pqlj")]
-unique_name_in_owner = true
-layout_mode = 2
-startup_label_text = "Eval Min"
-
-[node name="EvalMaxDisplay" parent="ScrollContainer/SideBar" instance=ExtResource("1_3pqlj")]
-unique_name_in_owner = true
-layout_mode = 2
-startup_label_text = "Eval Max"
-
 [node name="Separator1" type="HSeparator" parent="ScrollContainer/SideBar"]
 modulate = Color(1, 1, 1, 0)
 custom_minimum_size = Vector2(0, 24)
@@ -104,7 +94,6 @@ unique_name_in_owner = true
 layout_mode = 2
 theme = SubResource("Theme_vbm80")
 item_count = 3
-selected = 2
 popup/item_0/text = "Unclamped"
 popup/item_0/id = 0
 popup/item_1/text = "Clamped"
