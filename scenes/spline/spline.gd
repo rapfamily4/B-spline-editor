@@ -120,8 +120,10 @@ func evaluate_curve(evaluation_point: float) -> Vector2:
 	return de_boor_cox(CONTROL_POINTS_COUNT - 1, spline_degree, evaluation_point)
 
 func aux(control_point: int, degree: int, evaluation_point: float) -> float:
-	return ((evaluation_point - knots[control_point])
-			/ (knots[control_point + spline_degree + 1 - degree] - knots[control_point]))
+	if(knots[control_point] < knots[control_point + spline_degree + 1 - degree]):
+		return ((evaluation_point - knots[control_point])
+				/ (knots[control_point + spline_degree + 1 - degree] - knots[control_point]))
+	return 0
 
 func de_boor_cox(control_point: int, degree: int, evaluation_point: float) -> Vector2:
 	assert(0 <= control_point and control_point < CONTROL_POINTS_COUNT)
