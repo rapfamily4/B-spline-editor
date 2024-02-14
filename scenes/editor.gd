@@ -42,7 +42,7 @@ func _on_resolution_display_edited(value: float) -> void:
 func _on_knot_edited(index: int, value: float) -> void:
 	spline.set_knot(index, value)
 
-func _on_curve_connections_button_toggled(toggled_on: int) -> void:
+func _on_curve_connections_button_toggled(toggled_on: bool) -> void:
 	spline.show_curve_connection_markers = toggled_on
 
 func _on_knot_gen_dropdown_selected(value: int) -> void:
