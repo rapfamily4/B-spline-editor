@@ -1,9 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://dwaqt3gn0ljg7"]
+[gd_scene load_steps=2 format=2]
 
-[ext_resource type="Texture2D" uid="uid://bublflvjgnqtr" path="res://scenes/knot_marker/knot_marker.png" id="1_alfdl"]
+[ext_resource path="res://scenes/knot_marker/knot_marker.png" type="Texture" id=1]
 
-[node name="KnotMarker" type="Marker2D"]
+[node name="KnotMarker" type="Position2D"]
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.25, 0.25)
-texture = ExtResource("1_alfdl")
+[node name="Sprite" type="Sprite" parent="."]
+scale = Vector2( 0.25, 0.25 )
+texture = ExtResource( 1 )

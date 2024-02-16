@@ -1,22 +1,23 @@
-[gd_scene load_steps=6 format=3 uid="uid://c54q2t3y8qrgv"]
+[gd_scene load_steps=6 format=2]
 
-[ext_resource type="PackedScene" uid="uid://c88kfao0yffie" path="res://scenes/workbench/workbench.tscn" id="1_0hxwl"]
-[ext_resource type="Script" path="res://scenes/editor.gd" id="1_r6upe"]
-[ext_resource type="Script" path="res://scenes/draggable.gd" id="2_ahe6d"]
-[ext_resource type="PackedScene" uid="uid://b76gwna6pijs8" path="res://scenes/ui/ui.tscn" id="3_pkvle"]
-[ext_resource type="PackedScene" uid="uid://bmut4nt2aqqcq" path="res://scenes/spline/spline.tscn" id="4_h3hoy"]
+[ext_resource path="res://scenes/editor.gd" type="Script" id=1]
+[ext_resource path="res://scenes/workbench/workbench.tscn" type="PackedScene" id=2]
+[ext_resource path="res://scenes/spline/spline.tscn" type="PackedScene" id=3]
+[ext_resource path="res://scenes/ui/ui.tscn" type="PackedScene" id=4]
+[ext_resource path="res://scenes/draggable.gd" type="Script" id=5]
 
 [node name="Editor" type="Node2D"]
-script = ExtResource("1_r6upe")
+script = ExtResource( 1 )
 
-[node name="Camera" type="Camera2D" parent="."]
-script = ExtResource("2_ahe6d")
+[node name="Camera2D" type="Camera2D" parent="."]
+current = true
+script = ExtResource( 5 )
 button_to_press = 2
 mouse_must_be_over = false
 invert_mouse_delta = true
 
-[node name="Workbench" parent="." instance=ExtResource("1_0hxwl")]
+[node name="Workbench" parent="." instance=ExtResource( 2 )]
 
-[node name="Spline" parent="." instance=ExtResource("4_h3hoy")]
+[node name="Spline" parent="." instance=ExtResource( 3 )]
 
-[node name="UI" parent="." instance=ExtResource("3_pkvle")]
+[node name="UI" parent="." instance=ExtResource( 4 )]
