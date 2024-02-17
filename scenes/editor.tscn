@@ -12,6 +12,7 @@ script = ExtResource("1_r6upe")
 [node name="Camera" type="Camera2D" parent="."]
 script = ExtResource("2_ahe6d")
 button_to_press = 2
+allow_modifier_combo = true
 mouse_must_be_over = false
 invert_mouse_delta = true
 
