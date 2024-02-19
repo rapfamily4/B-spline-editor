@@ -1,6 +1,8 @@
 # B-spline editor
 Simple educational tool in which you can edit a B-spline evaluated with the De Boor - Cox algorithm.
 
+**Try it out** on itch.io by clicking [this link](https://rapfamily4.itch.io/b-spline-editor)!
+
 ## Overview
 The spline is highly customizable. You can edit the degree and resolution, as well as the position of control points, and see the changes to the curve in real time.
 There are several knot generators you may use. Clamped ones guarantee the curve to pass through the first and last control points.
