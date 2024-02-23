@@ -19,13 +19,15 @@ public class NumberDisplay : MonoBehaviour {
     protected TMP_Text m_label;
     protected TMP_InputField m_inputField;
 
-    protected virtual void Awake() {
-        valueEdited = new UnityEventFloat();
-
+    protected void Awake() {
         m_label = GetComponentInChildren<TMP_Text>();
+        m_inputField = GetComponentInChildren<TMP_InputField>();
+    }
+
+    protected virtual void Start() {
+        valueEdited = new UnityEventFloat();
         if (m_label != null )
             m_label.text = labelText;
-        m_inputField = GetComponentInChildren<TMP_InputField>();
         if (m_inputField != null) {
             if (roundToIntegers)
                 m_inputField.contentType = TMP_InputField.ContentType.IntegerNumber;

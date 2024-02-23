@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 
 public class UnityEventKnot : UnityEvent<int, float> { }
@@ -9,8 +10,13 @@ public class KnotDisplay : NumberDisplay {
 
     public int knotID = -1;
 
-    protected override void Awake() {
-        base.Awake();
+
+    public void SetBackgroundColor(ColorBlock colors) {
+        m_inputField.colors = colors;
+    }
+
+    protected override void Start() {
+        base.Start();
         knotEdited = new UnityEventKnot();
     }
 

@@ -145,5 +145,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controlPointPrefab: {fileID: 1987020321677661913, guid: 3509be3550f7f1a45b689704080a310e, type: 3}
-  knotMarkerPrefab: {fileID: 3815102360548986942, guid: a1d879643795cf34b8f5a3e88ce44771, type: 3}
+  knotMarkerPrefab: {fileID: 5314843331039732150, guid: a1d879643795cf34b8f5a3e88ce44771, type: 3}
   knotsGenerationMode: 0

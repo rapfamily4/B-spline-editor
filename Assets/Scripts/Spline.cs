@@ -19,7 +19,7 @@ public class Spline : MonoBehaviour {
     // m = n + k = knots.size - 1
 
     public Draggable controlPointPrefab;
-    public GameObject knotMarkerPrefab;
+    public Transform knotMarkerPrefab;
     public int degree {
         get { return m_degree; }
         set { 
@@ -94,15 +94,19 @@ public class Spline : MonoBehaviour {
         m_evaluationMax = m_knots[CONTROL_POINTS_COUNT];
         Debug.Log("Set evaluation range:\t[" + m_evaluationMin + ", " + m_evaluationMax + "]");
 
-        while (m_knotMarkersTree.transform.childCount > 0)
-            Destroy(m_knotMarkersTree.transform.GetChild(m_knotMarkersTree.transform.childCount - 1).gameObject);
+        foreach (Transform knotMarker in m_knotMarkersTree.transform)
+            Destroy(knotMarker.gameObject);
         for (int i = 0; i < m_knots.Count - 2 * degree - 2; i++) {
-            GameObject marker = Instantiate(knotMarkerPrefab);
+            Transform marker = Instantiate(knotMarkerPrefab);
             marker.transform.parent = m_knotMarkersTree.transform;
         }
 
         UpdateCurve();
         knotGenerationFinished.Invoke(m_knots);
+    }
+
+    public List<float> GetClonedKnots() {
+        return new List<float>(m_knots);
     }
 
     public void SetKnot(int index, float value) {
