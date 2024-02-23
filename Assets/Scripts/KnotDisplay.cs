@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -15,8 +16,8 @@ public class KnotDisplay : NumberDisplay {
         m_inputField.colors = colors;
     }
 
-    protected override void Start() {
-        base.Start();
+    protected override void Awake() {
+        base.Awake();
         knotEdited = new UnityEventKnot();
     }
 

@@ -19,13 +19,13 @@ public class NumberDisplay : MonoBehaviour {
     protected TMP_Text m_label;
     protected TMP_InputField m_inputField;
 
-    protected void Awake() {
+    protected virtual void Awake() {
+        valueEdited = new UnityEventFloat();
         m_label = GetComponentInChildren<TMP_Text>();
         m_inputField = GetComponentInChildren<TMP_InputField>();
     }
 
-    protected virtual void Start() {
-        valueEdited = new UnityEventFloat();
+    protected void Start() {
         if (m_label != null )
             m_label.text = labelText;
         if (m_inputField != null) {
@@ -33,11 +33,11 @@ public class NumberDisplay : MonoBehaviour {
                 m_inputField.contentType = TMP_InputField.ContentType.IntegerNumber;
             else
                 m_inputField.contentType = TMP_InputField.ContentType.DecimalNumber;
-            m_inputField.onSubmit.AddListener(HandleValueChanged);
+            m_inputField.onEndEdit.AddListener(HandleValueChanged);
         }
     }
 
-    protected virtual void OnDestroy() {
+    protected void OnDestroy() {
         if (m_inputField)
             m_inputField.onSubmit.RemoveAllListeners();
     }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine.Events;
 using UnityEngine;
 using Unity.VisualScripting;
+using System.Collections;
 
 public class UnityEventFloatList : UnityEvent<List<float>> {}
 
@@ -24,7 +25,7 @@ public class Spline : MonoBehaviour {
         get { return m_degree; }
         set { 
             m_degree = value;
-            GenerateKnots();
+            GenerateKnots(true);
         }
     }
     public int resolution {
@@ -69,7 +70,7 @@ public class Spline : MonoBehaviour {
         GenerateKnots();
     }
 
-    public void GenerateKnots() {
+    public void GenerateKnots(bool curveUpdatesNextFrame = false) {
         m_knots.Clear();
         for (int i = 0; i < CONTROL_POINTS_COUNT + degree + 1; i++) {
             if (knotsGenerationMode != KnotsGenerationMode.Unclamped) {
@@ -101,7 +102,10 @@ public class Spline : MonoBehaviour {
             marker.transform.parent = m_knotMarkersTree.transform;
         }
 
-        UpdateCurve();
+        if (curveUpdatesNextFrame)
+            StartCoroutine(YieldUpdateNextFrame());
+        else
+            UpdateCurve();
         knotGenerationFinished.Invoke(m_knots);
     }
 
@@ -158,5 +162,10 @@ public class Spline : MonoBehaviour {
         Vector3 deBoor0 = DeBoorCox(i, j - 1, evaluationPoint);
         Vector3 deBoor1 = DeBoorCox(i - 1, j - 1, evaluationPoint);
         return auxVal * deBoor0 + (1 - auxVal) * deBoor1;
+    }
+
+    private IEnumerator YieldUpdateNextFrame() {
+        yield return new WaitForEndOfFrame();
+        UpdateCurve();
     }
 }
